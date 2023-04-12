@@ -1,0 +1,59 @@
+---
+title: "1120412 HW"
+author:"Chia-Jui, Shih"
+author:"Li-Ying Chang"
+date: "2023/04/12"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+##Data
+```{r}
+bank2 <- read.table("~/AMSA/DATA/QID-942-MVAdenbank2/bank2.dat", quote="\"", comment.char="")
+V7 <- c(rep(1,100),rep(0,100))
+bank <- cbind.data.frame(bank2,V7)
+colnames(bank) <- c("Length","Height_L","Height_R","DL","DU","Length_C","T_F")
+set.seed(123)
+train <- sample(1:nrow(bank), 0.8*nrow(bank))
+test <- c(1:200)
+test <- test[-train]
+train <- bank[train,]
+test <- bank[test,]
+```
+
+## Naive regression
+```{r}
+model1 <- lm(train$T_F~. , data = train)
+summary(model1)
+
+```
+
+
+```{r}
+p1 <- predict(model1 , test)
+p1[which(p1 >= 0.5)] <- 1
+p1[which(p1 < 0.5)] <- 0
+
+SSEt1 <- sum((test$T_F-p1)^2)
+SSEt1
+```
+
+## Logistic regression
+```{r}
+model2 <- glm(train$T_F~. , data = train, family = binomial)
+summary(model2)
+
+```
+
+```{r}
+p2 <-predict(model2, test , type = "response")
+
+p2[which(p2 >= 0.5)] <- 1
+p2[which(p2 < 0.5)] <- 0
+
+
+SSEt2 <- sum((test$T_F-p2)^2)
+SSEt2
+```
+
